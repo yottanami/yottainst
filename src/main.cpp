@@ -24,6 +24,7 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 
 #include "main_menu.h"
+#include "synthesizer.h"
 
 
 #if LV_USE_LOG != 0
@@ -107,6 +108,7 @@ void setup()
 		// label = lv_label_create(btn);
 		// lv_label_set_text(label, "Hell Yeah");
 
+    synthesizer.setup();
     Serial.println( "Setup done" );
 }
 
