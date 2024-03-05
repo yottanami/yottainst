@@ -4,7 +4,10 @@
 class Synthesizer {
 public:
   Synthesizer();
-  void setup();	
+  void setup();
+
+private:
+  static void onControlChange(byte channel, byte control, byte value);
 };
 
 extern Synthesizer synthesizer;

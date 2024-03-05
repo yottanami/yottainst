@@ -1,0 +1,17 @@
+#N canvas 1280 0 1280 1006 12;
+#X obj 723 435 midiout;
+#X obj 295 317 vsl 20 170 0 127 0 0 empty empty empty 0 -9 0 12 #fcfcfc #000000 #000000 0 1;
+#X obj 392 317 vsl 20 170 0 127 0 0 empty empty empty 0 -9 0 12 #fcfcfc #000000 #000000 0 1;
+#X obj 478 319 vsl 20 170 0 127 0 0 empty empty empty 0 -9 0 12 #fcfcfc #000000 #000000 0 1;
+#X floatatom 478 499 5 0 0 0 - - - 0;
+#X floatatom 392 496 5 0 0 0 - - - 0;
+#X floatatom 295 497 5 0 0 0 - - - 0;
+#X obj 295 543 ctlout 100;
+#X obj 392 541 ctlout 101;
+#X obj 478 540 ctlout 102;
+#X connect 1 0 6 0;
+#X connect 2 0 5 0;
+#X connect 3 0 4 0;
+#X connect 4 0 9 0;
+#X connect 5 0 8 0;
+#X connect 6 0 7 0;

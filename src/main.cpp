@@ -1,11 +1,11 @@
 #include <lvgl.h>
 #include <XPT2046_Touchscreen.h>
-
 #include <SPI.h>
 
 //#if LV_USE_TFT_ESPI
 #include <TFT_eSPI.h>
 //#endif
+
 
 // XPT2046_Touchscreen
 #define CS_PIN  5
@@ -25,7 +25,6 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 #include "main_menu.h"
 #include "synthesizer.h"
-
 
 #if LV_USE_LOG != 0
 void print_logs( lv_log_level_t level, const char * buf )
@@ -116,5 +115,5 @@ void loop()
 {
     lv_task_handler(); /* let the GUI do its work */
     lv_tick_inc(5); /* tell LVGL how much time has passed */
-
+    usbMIDI.read();
 }
