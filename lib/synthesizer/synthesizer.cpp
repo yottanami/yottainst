@@ -11,15 +11,18 @@
 AudioSynthWaveform       waveform2;      //xy=258,335
 AudioSynthWaveform       waveform1;      //xy=260,272
 AudioSynthNoisePink      pink1;          //xy=265,391
-AudioMixer4              mixer1;         //xy=464,372
-AudioEffectEnvelope      envelope1;      //xy=615,372
-AudioOutputI2S           i2s1;           //xy=806,381
+AudioMixer4              mixer1;         //xy=479,376
+AudioFilterStateVariable filter1;        //xy=641,379
+AudioEffectEnvelope      envelope1;      //xy=853,357
+AudioOutputI2S           i2s1;           //xy=1044,366
 AudioConnection          patchCord1(waveform2, 0, mixer1, 1);
 AudioConnection          patchCord2(waveform1, 0, mixer1, 0);
 AudioConnection          patchCord3(pink1, 0, mixer1, 2);
-AudioConnection          patchCord4(mixer1, envelope1);
-AudioConnection          patchCord5(envelope1, 0, i2s1, 0);
-AudioConnection          patchCord6(envelope1, 0, i2s1, 1);
+AudioConnection          patchCord4(mixer1, 0, filter1, 0);
+AudioConnection          patchCord5(mixer1, 0, filter1, 1);
+AudioConnection          patchCord6(filter1, 0, envelope1, 0);
+AudioConnection          patchCord7(envelope1, 0, i2s1, 0);
+AudioConnection          patchCord8(envelope1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=448,517
 // GUItool: end automatically generated code
 
@@ -30,6 +33,7 @@ const float noteFreqs[128] = {8.176, 8.662, 9.177, 9.723, 10.301, 10.913, 11.562
 
 byte globalNote = 0;
 byte globalVelocity = 0;
+float glovalDetuneFactor = 1.0;
 int Synthesizer::octave = 0;
 const float DIV127 = (1.0 / 127.0);
 
@@ -118,7 +122,22 @@ void Synthesizer::onControlChange(byte channel, byte control, byte value){
   case 107:
     envelope1.release(3000 * (value * DIV127));
     break;
+
+  case 108:
+    // 95% to 100% of the original frequency
+    globalDetuneFactor = 1 - (0.05 * (value * DIV127));
+    Synthesizer::oscSet();
+    break;
+
+  case 109:
+    filter1.frequency(10000 + (value * DIV127));
+    break;
+
+  case 110:
+    filter1.resonance(4.3 * (value * DIV127) + 0.7);
+    break;
   }
+			
 }
 
 void Synthesizer::onNoteOn(byte channel, byte note, byte velocity){
@@ -170,7 +189,7 @@ void Synthesizer::keyBuff(byte note, bool playNote){
 
 void Synthesizer::oscPlay(byte note) {
   waveform1.frequency(noteFreqs[note]);
-  waveform2.frequency(noteFreqs[note + Synthesizer::octave]);
+  waveform2.frequency(noteFreqs[note + Synthesizer::octave] * globalDetuneFactor);
   float velo = (globalVelocity * DIV127);
   waveform1.amplitude(velo);
   waveform2.amplitude(velo);
@@ -181,6 +200,10 @@ void Synthesizer::oscPlay(byte note) {
 
 void Synthesizer::oscStop() {
   envelope1.noteOff();
-}    
+}
+
+void Synthesizer::oscSet() {
+  waveform1.frequency(noteFreqs[globalNote + Synthesizer::octave] * globalDetuneFactor);
+}
 
 Synthesizer synthesizer = Synthesizer();
