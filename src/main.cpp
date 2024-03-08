@@ -116,4 +116,5 @@ void loop()
     lv_task_handler(); /* let the GUI do its work */
     lv_tick_inc(5); /* tell LVGL how much time has passed */
     usbMIDI.read();
+    synthesizer.loop();
 }

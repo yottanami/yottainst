@@ -38,6 +38,14 @@ int Synthesizer::octave = 0;
 int globalBendRange = 12;
 float globalBendFactor = 1.0;
 
+unsigned int LFOspeed = 2000;
+float LFOpitch = 1;
+float LFOdepth = 0;
+byte LFOmodeSelect = 0;
+
+int FILfreq =  10000;
+float FILfactor = 1;
+
 const float DIV127 = (1.0 / 127.0);
 
 
@@ -74,6 +82,11 @@ void Synthesizer::setup(){
   envelope1.decay(0);
   envelope1.sustain(1);
   envelope1.release(500);
+}
+
+
+void Synthesizer::loop(){
+  LFOupdate(false, LFOmodeSelect, FILfactor, LFOdepth);
 }
 
 void Synthesizer::onControlChange(byte channel, byte control, byte value){
@@ -136,6 +149,7 @@ void Synthesizer::onControlChange(byte channel, byte control, byte value){
 
   case 109:
     filter1.frequency(10000 * (value * DIV127));
+    if (LFOmodeSelect < 1 || LFOmodeSelect > 5)filter1.frequency(FILfreq);
     break;
 
   case 110:
@@ -147,6 +161,22 @@ void Synthesizer::onControlChange(byte channel, byte control, byte value){
       globalBendRange = value;
     }
     break;
+  case 112:
+    {
+      float xSpeed = value * DIV127;
+      // Update LFO speed in exponential scale
+      xSpeed = pow(100, (xSpeed - 1));
+      LFOspeed = (70000 * xSpeed);
+    }
+    break;
+
+  case 113:
+    LFOdepth = value * DIV127;
+    break;
+
+  case 114:
+    LFOmodeSelect = value;
+    break;
   }
 			
 }
@@ -156,6 +186,7 @@ void Synthesizer::onNoteOn(byte channel, byte note, byte velocity){
     globalNote = note;
     globalVelocity = velocity;
     Synthesizer::keyBuff(note, true);
+    LFOupdate(true, LFOmodeSelect, FILfactor, LFOdepth);
   }
 }
 
@@ -200,7 +231,7 @@ void Synthesizer::keyBuff(byte note, bool playNote){
 
 void Synthesizer::oscPlay(byte note) {
   waveform1.frequency(noteFreqs[note] * globalBendFactor);
-  waveform2.frequency(noteFreqs[note + Synthesizer::octave] * globalDetuneFactor * globalBendFactor);
+  waveform2.frequency(noteFreqs[note + Synthesizer::octave] * globalDetuneFactor * globalBendFactor * LFOpitch);
   float velo = (globalVelocity * DIV127);
   waveform1.amplitude(velo);
   waveform2.amplitude(velo);
@@ -216,7 +247,7 @@ void Synthesizer::oscStop() {
 
 void Synthesizer::oscSet() {
   waveform1.frequency(noteFreqs[globalNote] * globalBendFactor);
-  waveform2.frequency(noteFreqs[globalNote + Synthesizer::octave] * globalDetuneFactor * globalBendFactor);
+  waveform2.frequency(noteFreqs[globalNote + Synthesizer::octave] * globalDetuneFactor * globalBendFactor * LFOpitch);
 }
 
 void Synthesizer::onPitchChange(byte channel, int pitch){
@@ -226,6 +257,148 @@ void Synthesizer::onPitchChange(byte channel, int pitch){
   bendFreq = bendFreq / 12;
   globalBendFactor = pow(2, bendFreq);
   Synthesizer::oscSet();
+}
+
+void Synthesizer::LFOupdate(bool retrig, byte mode, float FILtop, float FILbottom) {
+  static float LFO = 0;
+  static unsigned long LFOtime = 0;
+  static bool LFOdirection = false;
+  unsigned long currentMicros = micros();
+  static bool LFOstop = false;
+  static float LFOrange = 0;
+  static byte oldMode = 0;
+  static bool retriggered = false;
+
+  if (retrig == true) retriggered = true;
+
+
+  if (currentMicros - LFOtime >= LFOspeed) {
+    LFOtime = currentMicros;
+
+    if (mode != oldMode) {
+      if (mode == 0 || mode == 8) {
+        LFOpitch = 1;
+        Synthesizer::oscSet();
+        filter1.frequency(FILfreq);
+      }
+      else if (mode >= 1 || mode <= 7) {
+        LFOpitch = 1;
+        Synthesizer::oscSet();
+      }
+      else if (mode >= 9 || mode <= 13) {
+        filter1.frequency(FILfreq);
+      }
+      oldMode = mode;
+    }
+
+    LFOrange = FILtop - FILbottom;
+    if (LFOrange < 0) LFOrange = 0;
+
+    // LFO Modes
+    switch (mode) {
+
+    case 0: //Filter OFF
+      return;
+      break;
+    case 1: //Filter FREE
+      filter1.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+      break;
+    case 2: //Filter DOWN
+      if (retriggered == true) {
+	LFOdirection = true;
+	LFO = 1.0;
+      }
+      filter1.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+      break;
+    case 3: //Filter UP
+      if (retriggered == true) {
+	LFOdirection = false;
+	LFO = 0;
+      }
+      filter1.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+      break;
+    case 4: //Filter 1-DN
+      if (retriggered == true) {
+	LFOstop = false;
+	LFOdirection = true;
+	LFO = 1.0;
+      }
+      if (LFOstop == false) filter1.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+      break;
+    case 5: //Filter 1-UP
+      if (retriggered == true) {
+	LFOstop = false;
+	LFOdirection = false;
+	LFO = 0;
+      }
+      if (LFOstop == false) filter1.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+      break;
+    case 8: //Pitch OFF
+      return;
+      break;
+    case 9: //Pitch FREE
+      LFOpitch = (LFO * LFOdepth) + 1;
+      Synthesizer::oscSet();
+      break;
+    case 10: //Pitch DOWN
+      if (retriggered == true) {
+	LFOdirection = true;
+	LFO = 1.0;
+      }
+      LFOpitch = (LFO * LFOdepth) + 1;
+      Synthesizer::oscSet();
+      break;
+    case 11: //Pitch UP
+      if (retriggered == true) {
+	LFOdirection = false;
+	LFO = 0;
+      }
+      LFOpitch = (LFO * LFOdepth) + 1;
+      Synthesizer::oscSet();
+      break;
+    case 12: //Pitch 1-DN
+      if (retriggered == true) {
+	LFOstop = false;
+	LFOdirection = true;
+	LFO = 1.0;
+      }
+      if (LFOstop == false) {
+	LFOpitch = (LFO * LFOdepth) + 1;
+	Synthesizer::oscSet();
+      }
+      break;
+    case 13: //Pitch 1-UP
+      if (retriggered == true) {
+	LFOstop = false;
+	LFOdirection = false;
+	LFO = 0;
+      }
+      if (LFOstop == false) {
+	LFOpitch = (LFO * LFOdepth) + 1;
+	Synthesizer::oscSet();
+      }
+      break;
+    }
+
+    retriggered = false;
+
+    // Update LFO
+    if (LFOdirection == false) { //UP
+      LFO = (LFO + 0.01);
+      if (LFO >= 1) {
+        LFOdirection = true;
+        LFOstop = true;
+      }
+    }
+
+    if (LFOdirection == true) { //Down
+      LFO = (LFO - 0.01);
+      if (LFO <= 0) {
+        LFOdirection = false;
+        LFOstop = true;
+      }
+    }
+  }
 }
 
 Synthesizer synthesizer = Synthesizer();

@@ -7,6 +7,7 @@ public:
   
   Synthesizer();
   void setup();
+  void loop();
 
 private:
   static void onControlChange(byte channel, byte control, byte value);
@@ -17,6 +18,7 @@ private:
   static void oscPlay(byte note);
   static void oscStop();
   static void oscSet();
+  static void LFOupdate(bool retrig, byte mode, float FILtop, float FILbottom);
 };
 
 extern Synthesizer synthesizer;
