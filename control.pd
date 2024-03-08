@@ -34,6 +34,10 @@
 #X floatatom 532 513 5 0 0 0 - - - 0;
 #X obj 532 559 ctlout 109;
 #X obj 629 557 ctlout 110;
+#X obj 722 310 vsl 20 170 1 12 0 0 empty empty empty 0 -9 0 12 #fcfcfc #000000 #000000 0 1;
+#X floatatom 723 535 5 0 0 0 - - - 0;
+#X obj 724 582 ctlout 111;
+#X obj 725 509 int;
 #X connect 1 0 6 0;
 #X connect 2 0 5 0;
 #X connect 3 0 4 0;
@@ -57,3 +61,6 @@
 #X connect 30 0 31 0;
 #X connect 31 0 34 0;
 #X connect 32 0 33 0;
+#X connect 35 0 38 0;
+#X connect 36 0 37 0;
+#X connect 38 0 36 0;

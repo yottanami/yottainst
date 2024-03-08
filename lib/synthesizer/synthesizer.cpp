@@ -35,6 +35,9 @@ byte globalNote = 0;
 byte globalVelocity = 0;
 float globalDetuneFactor = 1.0;
 int Synthesizer::octave = 0;
+int globalBendRange = 12;
+float globalBendFactor = 1.0;
+
 const float DIV127 = (1.0 / 127.0);
 
 
@@ -46,6 +49,8 @@ void Synthesizer::setup(){
   usbMIDI.setHandleControlChange(Synthesizer::onControlChange);
   usbMIDI.setHandleNoteOn(Synthesizer::onNoteOn);
   usbMIDI.setHandleNoteOff(Synthesizer::onNoteOff);
+  usbMIDI.setHandlePitchChange(Synthesizer::onPitchChange);
+
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.32);
   
@@ -136,6 +141,12 @@ void Synthesizer::onControlChange(byte channel, byte control, byte value){
   case 110:
     filter1.resonance(4.3 * (value * DIV127) + 0.7);
     break;
+
+  case 111:
+    if (value <= 12 && value > 0){
+      globalBendRange = value;
+    }
+    break;
   }
 			
 }
@@ -188,8 +199,8 @@ void Synthesizer::keyBuff(byte note, bool playNote){
 }
 
 void Synthesizer::oscPlay(byte note) {
-  waveform1.frequency(noteFreqs[note]);
-  waveform2.frequency(noteFreqs[note + Synthesizer::octave] * globalDetuneFactor);
+  waveform1.frequency(noteFreqs[note] * globalBendFactor);
+  waveform2.frequency(noteFreqs[note + Synthesizer::octave] * globalDetuneFactor * globalBendFactor);
   float velo = (globalVelocity * DIV127);
   waveform1.amplitude(velo);
   waveform2.amplitude(velo);
@@ -202,8 +213,19 @@ void Synthesizer::oscStop() {
   envelope1.noteOff();
 }
 
+
 void Synthesizer::oscSet() {
-  waveform1.frequency(noteFreqs[globalNote + Synthesizer::octave] * globalDetuneFactor);
+  waveform1.frequency(noteFreqs[globalNote] * globalBendFactor);
+  waveform2.frequency(noteFreqs[globalNote + Synthesizer::octave] * globalDetuneFactor * globalBendFactor);
+}
+
+void Synthesizer::onPitchChange(byte channel, int pitch){
+  float bendFreq = pitch;
+  bendFreq = bendFreq / 8192;
+  bendFreq = bendFreq * globalBendRange;
+  bendFreq = bendFreq / 12;
+  globalBendFactor = pow(2, bendFreq);
+  Synthesizer::oscSet();
 }
 
 Synthesizer synthesizer = Synthesizer();
