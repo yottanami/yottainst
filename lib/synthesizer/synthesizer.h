@@ -15,6 +15,7 @@ private:
   static void keyBuff(byte note, bool on);
   static void oscPlay(byte note);
   static void oscStop();
+  static void oscSet();
 };
 
 extern Synthesizer synthesizer;

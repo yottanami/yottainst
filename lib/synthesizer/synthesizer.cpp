@@ -33,7 +33,7 @@ const float noteFreqs[128] = {8.176, 8.662, 9.177, 9.723, 10.301, 10.913, 11.562
 
 byte globalNote = 0;
 byte globalVelocity = 0;
-float glovalDetuneFactor = 1.0;
+float globalDetuneFactor = 1.0;
 int Synthesizer::octave = 0;
 const float DIV127 = (1.0 / 127.0);
 
@@ -130,7 +130,7 @@ void Synthesizer::onControlChange(byte channel, byte control, byte value){
     break;
 
   case 109:
-    filter1.frequency(10000 + (value * DIV127));
+    filter1.frequency(10000 * (value * DIV127));
     break;
 
   case 110:
