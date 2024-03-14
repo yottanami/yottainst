@@ -24,7 +24,14 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 
 #include "main_menu.h"
-#include "synthesizer.h"
+//#include "lead_synth.h"
+//#include "mid_synth.h"
+#include "audio_setup.h"
+#include "synth.h"
+// initialize Synth and store it is lead_synth variable
+// new Synth(lead_waveform1, lead_waveform2);
+// define lead_synth first
+
 
 #if LV_USE_LOG != 0
 void print_logs( lv_log_level_t level, const char * buf )
@@ -48,8 +55,6 @@ void my_disp_flush( lv_display_t *disp, const lv_area_t *area, uint8_t * px_map)
 
   lv_disp_flush_ready(disp);
 }
-
-
 
 
 void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data ) 
@@ -105,9 +110,24 @@ void setup()
 		// lv_obj_align( btn, LV_ALIGN_CENTER, 0, 0 );
 		// 			lv_obj_t * label;
 		// label = lv_label_create(btn);
-		// lv_label_set_text(label, "Hell Yeah");
+		// lv_label_set_text(label, "Hell Yeah");    
+    setupAudio();
+    
+    Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_envelope);
+    lead_synth.setup();
 
-    synthesizer.setup();
+
+    Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_envelope);
+    mid_synth.setup();
+
+    Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_envelope);
+
+    lead_synth.oscPlay(69);
+    delay(1000);
+    mid_synth.oscPlay(90);
+    delay(1000);
+    bass_synth.oscPlay(100);
+    
     Serial.println( "Setup done" );
 }
 
@@ -115,6 +135,6 @@ void loop()
 {
     lv_task_handler(); /* let the GUI do its work */
     lv_tick_inc(5); /* tell LVGL how much time has passed */
-    usbMIDI.read();
-    synthesizer.loop();
+    //usbMIDI.read();
 }
+
