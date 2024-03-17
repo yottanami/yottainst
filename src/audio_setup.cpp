@@ -164,8 +164,6 @@ AudioConnection          patchCord43(global_filter_mixer, 0, i2s1, 0);
 AudioConnection          patchCord44(global_filter_mixer, 0, i2s1, 1);
 
 
-
-
 void setupAudio() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.32);

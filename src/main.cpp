@@ -113,20 +113,20 @@ void setup()
 		// lv_label_set_text(label, "Hell Yeah");    
     setupAudio();
     
-    Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_envelope);
+    Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
     lead_synth.setup();
 
 
-    Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_envelope);
+    Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
     mid_synth.setup();
 
-    Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_envelope);
+    Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
 
     lead_synth.oscPlay(69);
     delay(1000);
     mid_synth.oscPlay(90);
     delay(1000);
-    bass_synth.oscPlay(100);
+    bass_synth.oscPlay(40);
     
     Serial.println( "Setup done" );
 }

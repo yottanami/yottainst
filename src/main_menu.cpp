@@ -1,7 +1,7 @@
 # include "Arduino.h"
 #include <lvgl.h>
 # include "main_menu.h"
-#include "../settings.h"
+#include "settings.h"
 
 
 MainMenu::MainMenu(){
