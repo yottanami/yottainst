@@ -1,17 +1,18 @@
 #ifndef PLAY_MODE_H
 #define PLAY_MODE_H
 #include <Audio.h>
+#include "synth.h"
 
 class PlayMode {
- public:
-  
+public:  
   PlayMode();
   void setup();
   void loop();
-  static void printBytes(byte *data, unsigned int size);
+  void setSynth(Synth& synth);
+  static void printBytes(const byte *data, unsigned int size);
   
- private:
-
+private:
+  static Synth* synth;
   static void myNoteOn(byte channel, byte note, byte velocity);
   static void myNoteOff(byte channel, byte note, byte velocity);
   static void myControlChange(byte channel, byte control, byte value);
@@ -25,16 +26,15 @@ class PlayMode {
   static void myActiveSensing();
   static void mySystemReset();
   static void myAfterTouchPoly(byte channel, byte note, byte pressure);
-
   static void myAfterTouchChannel(byte channel, byte pressure);
   static void myPitchChange(byte channel, int pitch);
-  static void mySongPosition(unsigned beats);
+  static void mySongPosition(uint16_t beats);
   static void mySongSelect(byte songnumber);
   static void myTuneRequest();
   static void myTimeCodeQuarterFrame(byte data);
-  static void mySystemExclusiveChunk(byte *array, unsigned size);
-
-  
+  static void mySystemExclusiveChunk(const byte *data, uint16_t length, bool last);
 };
+
+extern PlayMode play_mode;
 
 #endif

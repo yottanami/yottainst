@@ -7,6 +7,95 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
+class AudioSetup {
+ public:
+  static AudioSetup* getInstance();
+  void setup();
+  ~AudioSetup();
+
+  AudioSynthWaveform      lead_waveform1;
+  AudioSynthWaveform      lead_waveform2;
+  AudioSynthWaveform      mid_waveform1;
+ AudioSynthWaveform      mid_waveform2;
+ AudioSynthWaveform      bass_waveform1;
+ AudioSynthWaveform      bass_waveform2;
+ AudioSynthNoisePink     mid_pink;
+ AudioSynthNoisePink     lead_pink;
+ AudioSynthNoisePink     bass_pink;
+ AudioSynthSimpleDrum    drum;
+ AudioMixer4             mid_mixer;
+ AudioMixer4             lead_mixer;
+ AudioMixer4             bass_mixer;
+ AudioFilterStateVariable drum_filter;
+ AudioFilterStateVariable mid_filter;
+ AudioFilterStateVariable bass_filter;
+ AudioFilterStateVariable lead_filter;
+ AudioMixer4             drum_mixer;
+ AudioMixer4             mid_filter_mixer;
+ AudioMixer4             bass_filter_mixer;
+ AudioMixer4             lead_filter_mixer;
+ AudioEffectEnvelope     drum_envelope;
+ AudioEffectEnvelope     mid_envelope;
+ AudioEffectEnvelope     bass_envelope;
+ AudioEffectEnvelope     lead_envelope;
+ AudioMixer4             global_mixer;
+ AudioFilterStateVariable global_filter;
+ AudioMixer4             global_filter_mixer;
+ AudioOutputI2S          i2s1;
+ AudioControlSGTL5000    sgtl5000_1;
+
+ AudioConnection          patchCord1;
+ AudioConnection          patchCord2;
+ AudioConnection          patchCord3;
+ AudioConnection          patchCord4;
+ AudioConnection          patchCord5;
+ AudioConnection          patchCord6;
+ AudioConnection          patchCord7;
+ AudioConnection          patchCord8;
+ AudioConnection          patchCord9;
+ AudioConnection          patchCord10;
+ AudioConnection          patchCord11;
+ AudioConnection          patchCord12;
+ AudioConnection          patchCord13;
+ AudioConnection          patchCord14;
+ AudioConnection          patchCord15;
+ AudioConnection          patchCord16;
+ AudioConnection          patchCord17;
+ AudioConnection          patchCord18;
+ AudioConnection          patchCord19;
+ AudioConnection          patchCord20;
+ AudioConnection          patchCord21;
+ AudioConnection          patchCord22;
+ AudioConnection          patchCord23;
+ AudioConnection          patchCord24;
+ AudioConnection          patchCord25;
+ AudioConnection          patchCord26;
+ AudioConnection          patchCord27;
+ AudioConnection          patchCord28;
+ AudioConnection          patchCord29;
+ AudioConnection          patchCord30;
+ AudioConnection          patchCord31;
+ AudioConnection          patchCord32;
+ AudioConnection          patchCord33;
+ AudioConnection          patchCord34;
+ AudioConnection          patchCord35;
+ AudioConnection          patchCord36;
+ AudioConnection          patchCord37;
+ AudioConnection          patchCord38;
+ AudioConnection          patchCord39;
+ AudioConnection          patchCord40;
+ AudioConnection          patchCord41;
+ AudioConnection          patchCord42;
+ AudioConnection          patchCord43;
+ AudioConnection          patchCord44;
+
+
+  
+ private:  
+  AudioSetup() {};
+  static AudioSetup* instance;  
+};
+
 /* // GUItool: begin automatically generated code */
 /* AudioSynthWaveform       lead_waveform2;      //xy=67.5714340209961,63.14285659790039 */
 /* AudioSynthWaveform       mid_waveform1;      //xy=68,155 */
@@ -86,84 +175,84 @@
 
 
 // Declare audio objects
-extern AudioSynthWaveform      lead_waveform1;
-extern AudioSynthWaveform      lead_waveform2;
-extern AudioSynthWaveform      mid_waveform1;
-extern AudioSynthWaveform      mid_waveform2;
-extern AudioSynthWaveform      bass_waveform1;
-extern AudioSynthWaveform      bass_waveform2;
-extern AudioSynthNoisePink     mid_pink;
-extern AudioSynthNoisePink     lead_pink;
-extern AudioSynthNoisePink     bass_pink;
-extern AudioSynthSimpleDrum    drum;
-extern AudioMixer4             mid_mixer;
-extern AudioMixer4             lead_mixer;
-extern AudioMixer4             bass_mixer;
-extern AudioFilterStateVariable drum_filter;
-extern AudioFilterStateVariable mid_filter;
-extern AudioFilterStateVariable bass_filter;
-extern AudioFilterStateVariable lead_filter;
-extern AudioMixer4             drum_mixer;
-extern AudioMixer4             mid_filter_mixer;
-extern AudioMixer4             bass_filter_mixer;
-extern AudioMixer4             lead_filter_mixer;
-extern AudioEffectEnvelope     drum_envelope;
-extern AudioEffectEnvelope     mid_envelope;
-extern AudioEffectEnvelope     bass_envelope;
-extern AudioEffectEnvelope     lead_envelope;
-extern AudioMixer4             global_mixer;
-extern AudioFilterStateVariable global_filter;
-extern AudioMixer4             global_filter_mixer;
-extern AudioOutputI2S          i2s1;
-extern AudioControlSGTL5000    sgtl5000_1;
+/* extern AudioSynthWaveform      lead_waveform1; */
+/* extern AudioSynthWaveform      lead_waveform2; */
+/* extern AudioSynthWaveform      mid_waveform1; */
+/* extern AudioSynthWaveform      mid_waveform2; */
+/* extern AudioSynthWaveform      bass_waveform1; */
+/* extern AudioSynthWaveform      bass_waveform2; */
+/* extern AudioSynthNoisePink     mid_pink; */
+/* extern AudioSynthNoisePink     lead_pink; */
+/* extern AudioSynthNoisePink     bass_pink; */
+/* extern AudioSynthSimpleDrum    drum; */
+/* extern AudioMixer4             mid_mixer; */
+/* extern AudioMixer4             lead_mixer; */
+/* extern AudioMixer4             bass_mixer; */
+/* extern AudioFilterStateVariable drum_filter; */
+/* extern AudioFilterStateVariable mid_filter; */
+/* extern AudioFilterStateVariable bass_filter; */
+/* extern AudioFilterStateVariable lead_filter; */
+/* extern AudioMixer4             drum_mixer; */
+/* extern AudioMixer4             mid_filter_mixer; */
+/* extern AudioMixer4             bass_filter_mixer; */
+/* extern AudioMixer4             lead_filter_mixer; */
+/* extern AudioEffectEnvelope     drum_envelope; */
+/* extern AudioEffectEnvelope     mid_envelope; */
+/* extern AudioEffectEnvelope     bass_envelope; */
+/* extern AudioEffectEnvelope     lead_envelope; */
+/* extern AudioMixer4             global_mixer; */
+/* extern AudioFilterStateVariable global_filter; */
+/* extern AudioMixer4             global_filter_mixer; */
+/* extern AudioOutputI2S          i2s1; */
+/* extern AudioControlSGTL5000    sgtl5000_1; */
 
 
-// Declare audio connections
-extern AudioConnection          patchCord1;
-extern AudioConnection          patchCord2;
-extern AudioConnection          patchCord3;
-extern AudioConnection          patchCord4;
-extern AudioConnection          patchCord5;
-extern AudioConnection          patchCord6;
-extern AudioConnection          patchCord7;
-extern AudioConnection          patchCord8;
-extern AudioConnection          patchCord9;
-extern AudioConnection          patchCord10;
-extern AudioConnection          patchCord11;
-extern AudioConnection          patchCord12;
-extern AudioConnection          patchCord13;
-extern AudioConnection          patchCord14;
-extern AudioConnection          patchCord15;
-extern AudioConnection          patchCord16;
-extern AudioConnection          patchCord17;
-extern AudioConnection          patchCord18;
-extern AudioConnection          patchCord19;
-extern AudioConnection          patchCord20;
-extern AudioConnection          patchCord21;
-extern AudioConnection          patchCord22;
-extern AudioConnection          patchCord23;
-extern AudioConnection          patchCord24;
-extern AudioConnection          patchCord25;
-extern AudioConnection          patchCord26;
-extern AudioConnection          patchCord27;
-extern AudioConnection          patchCord28;
-extern AudioConnection          patchCord29;
-extern AudioConnection          patchCord30;
-extern AudioConnection          patchCord31;
-extern AudioConnection          patchCord32;
-extern AudioConnection          patchCord33;
-extern AudioConnection          patchCord34;
-extern AudioConnection          patchCord35;
-extern AudioConnection          patchCord36;
-extern AudioConnection          patchCord37;
-extern AudioConnection          patchCord38;
-extern AudioConnection          patchCord39;
-extern AudioConnection          patchCord40;
-extern AudioConnection          patchCord41;
-extern AudioConnection          patchCord42;
-extern AudioConnection          patchCord43;
-extern AudioConnection          patchCord44;
+/* // Declare audio connections */
+/* extern AudioConnection          patchCord1; */
+/* extern AudioConnection          patchCord2; */
+/* extern AudioConnection          patchCord3; */
+/* extern AudioConnection          patchCord4; */
+/* extern AudioConnection          patchCord5; */
+/* extern AudioConnection          patchCord6; */
+/* extern AudioConnection          patchCord7; */
+/* extern AudioConnection          patchCord8; */
+/* extern AudioConnection          patchCord9; */
+/* extern AudioConnection          patchCord10; */
+/* extern AudioConnection          patchCord11; */
+/* extern AudioConnection          patchCord12; */
+/* extern AudioConnection          patchCord13; */
+/* extern AudioConnection          patchCord14; */
+/* extern AudioConnection          patchCord15; */
+/* extern AudioConnection          patchCord16; */
+/* extern AudioConnection          patchCord17; */
+/* extern AudioConnection          patchCord18; */
+/* extern AudioConnection          patchCord19; */
+/* extern AudioConnection          patchCord20; */
+/* extern AudioConnection          patchCord21; */
+/* extern AudioConnection          patchCord22; */
+/* extern AudioConnection          patchCord23; */
+/* extern AudioConnection          patchCord24; */
+/* extern AudioConnection          patchCord25; */
+/* extern AudioConnection          patchCord26; */
+/* extern AudioConnection          patchCord27; */
+/* extern AudioConnection          patchCord28; */
+/* extern AudioConnection          patchCord29; */
+/* extern AudioConnection          patchCord30; */
+/* extern AudioConnection          patchCord31; */
+/* extern AudioConnection          patchCord32; */
+/* extern AudioConnection          patchCord33; */
+/* extern AudioConnection          patchCord34; */
+/* extern AudioConnection          patchCord35; */
+/* extern AudioConnection          patchCord36; */
+/* extern AudioConnection          patchCord37; */
+/* extern AudioConnection          patchCord38; */
+/* extern AudioConnection          patchCord39; */
+/* extern AudioConnection          patchCord40; */
+/* extern AudioConnection          patchCord41; */
+/* extern AudioConnection          patchCord42; */
+/* extern AudioConnection          patchCord43; */
+/* extern AudioConnection          patchCord44; */
 
-void setupAudio();
+/* void setup(); */
 
 #endif

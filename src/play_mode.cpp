@@ -3,50 +3,70 @@
 
 #include <USBHost_t36.h>
 #include <EEPROM.h>
+#include "settings.h"
+#include "audio_setup.h"
+#include "lead_synth.h"
+Synth* PlayMode::synth = nullptr; 
+
 PlayMode::PlayMode() {
   // Constructor
+
 }
+
+
 USBHost myusb;
 USBHub hub1(myusb);
-USBHub hub2(myusb);
+//USBHub hub2(myusb);
 MIDIDevice midi1(myusb);
 
+void PlayMode::setSynth(Synth& synth){
+  //this->synth = &synth;
+  // LeadSynth lead_synth;
+  // lead_synth.setup();
+  
+   this->synth = &synth;
+}
 
 void PlayMode::setup() {
-  Serial.begin(115200);
 
   // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
   // use too much power, Teensy at least completes USB enumeration, which
   // makes isolating the power issue easier.
   delay(1500);
   Serial.println("USB Host InputFunctions example");
+
   delay(10);
   myusb.begin();
 
+  
   midi1.setHandleNoteOn(myNoteOn);
-  midi1.setHandleNoteOff(myNoteOff);
-  midi1.setHandleAfterTouchPoly(myAfterTouchPoly);
-  midi1.setHandleControlChange(myControlChange);
-  midi1.setHandleProgramChange(myProgramChange);
-  midi1.setHandleAfterTouchChannel(myAfterTouchChannel);
-  midi1.setHandlePitchChange(myPitchChange);
+  //midi1.setHandleNoteOff(myNoteOff);
+  //midi1.setHandleAfterTouchPoly(myAfterTouchPoly);
+  //midi1.setHandleControlChange(myControlChange);
+  //midi1.setHandleProgramChange(myProgramChange);
+  //midi1.setHandleAfterTouchChannel(myAfterTouchChannel);
+  //midi1.setHandlePitchChange(myPitchChange);
   // Only one of these System Exclusive handlers will actually be
   // used.  See the comments below for the difference between them.
-  midi1.setHandleSystemExclusive(mySystemExclusiveChunk);
-  midi1.setHandleSystemExclusive(mySystemExclusive); 
-  midi1.setHandleTimeCodeQuarterFrame(myTimeCodeQuarterFrame);
-  midi1.setHandleSongPosition(mySongPosition);
-  midi1.setHandleSongSelect(mySongSelect);
-  midi1.setHandleTuneRequest(myTuneRequest);
-  midi1.setHandleClock(myClock);
-  midi1.setHandleStart(myStart);
-  midi1.setHandleContinue(myContinue);
-  midi1.setHandleStop(myStop);
-  midi1.setHandleActiveSensing(myActiveSensing);
-  midi1.setHandleSystemReset(mySystemReset);
+  //midi1.setHandleSystemExclusive(mySystemExclusiveChunk);
+  //midi1.setHandleSystemExclusive(mySystemExclusive); 
+  // midi1.setHandleTimeCodeQuarterFrame(myTimeCodeQuarterFrame);
+  // midi1.setHandleSongPosition(mySongPosition);
+  // midi1.setHandleSongSelect(mySongSelect);
+  // midi1.setHandleTuneRequest(myTuneRequest);
+  // midi1.setHandleClock(myClock);
+  // midi1.setHandleStart(myStart);
+  // midi1.setHandleContinue(myContinue);
+  // midi1.setHandleStop(myStop);
+  // midi1.setHandleActiveSensing(myActiveSensing);
+  // midi1.setHandleSystemReset(mySystemReset);
   // This generic System Real Time handler is only used if the
   // more specific ones are not set.
-  midi1.setHandleRealTimeSystem(myRealTimeSystem);
+  //midi1.setHandleRealTimeSystem(myRealTimeSystem);
+  Serial.println("USB Host InputFunctions setup done");
+  //active_synth = settings->getActiveSynth();
+
+  Serial.println("Play mode setup done");
 }
 
 void PlayMode::loop() {
@@ -56,22 +76,63 @@ void PlayMode::loop() {
   // data and run the handler functions as messages arrive.
   myusb.Task();
   midi1.read();
+  // ignore incoming messages
 }
 
 
-void myNoteOn(byte channel, byte note, byte velocity) {
+void PlayMode::myNoteOn(byte channel, byte note, byte velocity) {
   // When a USB device with multiple virtual cables is used,
   // midi1.getCable() can be used to read which of the virtual
   // MIDI cables received this message.
+      
   Serial.print("Note On, ch=");
   Serial.print(channel, DEC);
   Serial.print(", note=");
   Serial.print(note, DEC);
   Serial.print(", velocity=");
   Serial.println(velocity, DEC);
+
+  if (synth != nullptr) {
+    Serial.println("Playing note");
+      synth->oscPlay(40);
+      Serial.println("Note played");
+    }
+  
+  // if(settings->getMode() == Mode::PLAY){
+  //   Serial.println("PLAY MODE");
+  // }else if(settings->getMode() == Mode::SEQUENCER){
+  //   Serial.println("SEQUENCER MODE");
+  // } else if(settings->getMode() == Mode::ARPEGGIATOR){
+  //   Serial.println("ARPEGGIATOR MODE");
+  // } else {
+  //   Serial.println("UNKNOWN MODE");
+  // }
+
+  // if(settings->getActiveSynth() != nullptr){
+  //   Serial.println("Playing note");
+
+  //   Synth* active_synth = settings->getActiveSynth();
+  //   // active_synth->onNoteOn(channel, note, velocity);
+  //   if (active_synth == nullptr){
+  // 			Serial.println("Active synth is null");
+  // 		}else {
+  //     active_synth->oscPlay(40);
+  //   //    Serial.println(active_synth->); // ;
+  //   Serial.println("Note played");
+  //   }
+  // }else{
+  //   Serial.println("No active synth");
+  // }
+  //active_synth->oscPlay(40);
+  //Synth* active_synth = settings->getActiveSynth();
+  //active_synth->oscPlay(40);
+  
+  
+  
 }
 
-void myNoteOff(byte channel, byte note, byte velocity) {
+void PlayMode::myNoteOff(byte channel, byte note, byte velocity) {
+  synth->onNoteOff(channel, note, velocity);
   Serial.print("Note Off, ch=");
   Serial.print(channel, DEC);
   Serial.print(", note=");
@@ -80,7 +141,7 @@ void myNoteOff(byte channel, byte note, byte velocity) {
   Serial.println(velocity, DEC);
 }
 
-void myAfterTouchPoly(byte channel, byte note, byte velocity) {
+void PlayMode:: myAfterTouchPoly(byte channel, byte note, byte velocity) {
   Serial.print("AfterTouch Change, ch=");
   Serial.print(channel, DEC);
   Serial.print(", note=");
@@ -89,7 +150,7 @@ void myAfterTouchPoly(byte channel, byte note, byte velocity) {
   Serial.println(velocity, DEC);
 }
 
-void myControlChange(byte channel, byte control, byte value) {
+void PlayMode::myControlChange(byte channel, byte control, byte value) {
   Serial.print("Control Change, ch=");
   Serial.print(channel, DEC);
   Serial.print(", control=");
@@ -98,21 +159,21 @@ void myControlChange(byte channel, byte control, byte value) {
   Serial.println(value, DEC);
 }
 
-void myProgramChange(byte channel, byte program) {
+void PlayMode::myProgramChange(byte channel, byte program) {
   Serial.print("Program Change, ch=");
   Serial.print(channel, DEC);
   Serial.print(", program=");
   Serial.println(program, DEC);
 }
 
-void myAfterTouchChannel(byte channel, byte pressure) {
+void PlayMode::myAfterTouchChannel(byte channel, byte pressure) {
   Serial.print("After Touch, ch=");
   Serial.print(channel, DEC);
   Serial.print(", pressure=");
   Serial.println(pressure, DEC);
 }
 
-void myPitchChange(byte channel, int pitch) {
+void PlayMode::myPitchChange(byte channel, int pitch) {
   Serial.print("Pitch Change, ch=");
   Serial.print(channel, DEC);
   Serial.print(", pitch=");
@@ -126,9 +187,9 @@ void myPitchChange(byte channel, int pitch) {
 // 3rd parameter to tell you which is the last chunk.  This function is
 // a Teensy extension, not available in the Arduino MIDI library.
 //
-void mySystemExclusiveChunk(const byte *data, uint16_t length, bool last) {
+void PlayMode::mySystemExclusiveChunk(const byte *data, uint16_t length, bool last) {
   Serial.print("SysEx Message: ");
-  PlayMode::printBytes(data, length);
+  printBytes(data, length);
   if (last) {
     Serial.println(" (end)");
   } else {
@@ -141,13 +202,13 @@ void mySystemExclusiveChunk(const byte *data, uint16_t length, bool last) {
 // no way to receive the data which did not fit in the buffer.  If both types
 // of SysEx functions are set, the 3-input version will be called by midi1.
 //
-void mySystemExclusive(byte *data, unsigned int length) {
+void PlayMode::mySystemExclusive(byte *data, unsigned int length) {
   Serial.print("SysEx Message: ");
-  PlayMode::printBytes(data, length);
+  printBytes(data, length);
   Serial.println();
 }
 
-void myTimeCodeQuarterFrame(byte data) {
+void PlayMode::myTimeCodeQuarterFrame(byte data) {
   static char SMPTE[8]={'0','0','0','0','0','0','0','0'};
   static byte fps=0;
   byte index = data >> 4;
@@ -182,52 +243,52 @@ void myTimeCodeQuarterFrame(byte data) {
   }
 }
 
-void mySongPosition(uint16_t beats) {
+void PlayMode::mySongPosition(uint16_t beats) {
   Serial.print("Song Position, beat=");
   Serial.println(beats);
 }
 
-void mySongSelect(byte songNumber) {
+void PlayMode::mySongSelect(byte songNumber) {
   Serial.print("Song Select, song=");
   Serial.println(songNumber, DEC);
 }
 
-void myTuneRequest() {
+void PlayMode::myTuneRequest() {
   Serial.println("Tune Request");
 }
 
-void myClock() {
+void PlayMode::myClock() {
   Serial.println("Clock");
 }
 
-void myStart() {
+void PlayMode::myStart() {
   Serial.println("Start");
 }
 
-void myContinue() {
+void PlayMode::myContinue() {
   Serial.println("Continue");
 }
 
-void myStop() {
+void PlayMode::myStop() {
   Serial.println("Stop");
 }
 
-void myActiveSensing() {
+void PlayMode::myActiveSensing() {
   Serial.println("Actvice Sensing");
 }
 
-void mySystemReset() {
+void PlayMode::mySystemReset() {
   Serial.println("System Reset");
 }
 
-void myRealTimeSystem(uint8_t realtimebyte) {
+void PlayMode::myRealTimeSystem(uint8_t realtimebyte) {
   Serial.print("Real Time Message, code=");
   Serial.println(realtimebyte, HEX);
 }
 
 
 
-void printBytes(const byte *data, unsigned int size) {
+void PlayMode::printBytes(const byte *data, unsigned int size) {
   while (size > 0) {
     byte b = *data++;
     if (b < 16) Serial.print('0');
@@ -236,3 +297,6 @@ void printBytes(const byte *data, unsigned int size) {
     size = size - 1;
   }
 }
+
+
+PlayMode play_mode = PlayMode();

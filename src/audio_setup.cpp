@@ -84,90 +84,103 @@
 /* // GUItool: end automatically generated code */
 
 
-// Define audio objects
-AudioSynthWaveform    lead_waveform1;
-AudioSynthWaveform    lead_waveform2;
-AudioSynthWaveform    mid_waveform1;
-AudioSynthWaveform    mid_waveform2;
-AudioSynthWaveform    bass_waveform1;
-AudioSynthWaveform    bass_waveform2;
-AudioSynthNoisePink   mid_pink;
-AudioSynthNoisePink   lead_pink;
-AudioSynthNoisePink   bass_pink;
-AudioSynthSimpleDrum  drum;
-AudioMixer4           mid_mixer;
-AudioMixer4           lead_mixer;
-AudioMixer4           bass_mixer;
-AudioFilterStateVariable drum_filter;
-AudioFilterStateVariable mid_filter;
-AudioFilterStateVariable bass_filter;
-AudioFilterStateVariable lead_filter;
-AudioMixer4           drum_mixer;
-AudioMixer4           mid_filter_mixer;
-AudioMixer4           bass_filter_mixer;
-AudioMixer4           lead_filter_mixer;
-AudioEffectEnvelope   drum_envelope;
-AudioEffectEnvelope   mid_envelope;
-AudioEffectEnvelope   bass_envelope;
-AudioEffectEnvelope   lead_envelope;
-AudioMixer4           global_mixer;
-AudioFilterStateVariable global_filter;
-AudioMixer4           global_filter_mixer;
-AudioOutputI2S        i2s1;
-AudioControlSGTL5000  sgtl5000_1;
+// // Define audio objects
+// AudioSynthWaveform    lead_waveform1;
+// AudioSynthWaveform    lead_waveform2;
+// AudioSynthWaveform    mid_waveform1;
+// AudioSynthWaveform    mid_waveform2;
+// AudioSynthWaveform    bass_waveform1;
+// AudioSynthWaveform    bass_waveform2;
+// AudioSynthNoisePink   mid_pink;
+// AudioSynthNoisePink   lead_pink;
+// AudioSynthNoisePink   bass_pink;
+// AudioSynthSimpleDrum  drum;
+// AudioMixer4           mid_mixer;
+// AudioMixer4           lead_mixer;
+// AudioMixer4           bass_mixer;
+// AudioFilterStateVariable drum_filter;
+// AudioFilterStateVariable mid_filter;
+// AudioFilterStateVariable bass_filter;
+// AudioFilterStateVariable lead_filter;
+// AudioMixer4           drum_mixer;
+// AudioMixer4           mid_filter_mixer;
+// AudioMixer4           bass_filter_mixer;
+// AudioMixer4           lead_filter_mixer;
+// AudioEffectEnvelope   drum_envelope;
+// AudioEffectEnvelope   mid_envelope;
+// AudioEffectEnvelope   bass_envelope;
+// AudioEffectEnvelope   lead_envelope;
+// AudioMixer4           global_mixer;
+// AudioFilterStateVariable global_filter;
+// AudioMixer4           global_filter_mixer;
+// AudioOutputI2S        i2s1;
+// AudioControlSGTL5000  sgtl5000_1;
 
 
-// Define audio connections
-AudioConnection          patchCord1(lead_waveform2, 0, lead_mixer, 1);
-AudioConnection          patchCord2(mid_waveform1, 0, mid_mixer, 0);
-AudioConnection          patchCord3(lead_waveform1, 0, lead_mixer, 0);
-AudioConnection          patchCord4(mid_waveform2, 0, mid_mixer, 1);
-AudioConnection          patchCord5(bass_waveform1, 0, bass_mixer, 0);
-AudioConnection          patchCord6(bass_waveform2, 0, bass_mixer, 1);
-AudioConnection          patchCord7(mid_pink, 0, mid_mixer, 2);
-AudioConnection          patchCord8(lead_pink, 0, lead_mixer, 2);
-AudioConnection          patchCord9(bass_pink, 0, bass_mixer, 2);
-AudioConnection          patchCord10(drum, 0, drum_filter, 0);
-AudioConnection          patchCord11(drum, 0, drum_filter, 1);
-AudioConnection          patchCord12(mid_mixer, 0, mid_filter, 0);
-AudioConnection          patchCord13(mid_mixer, 0, mid_filter, 1);
-AudioConnection          patchCord14(lead_mixer, 0, lead_filter, 0);
-AudioConnection          patchCord15(lead_mixer, 0, lead_filter, 1);
-AudioConnection          patchCord16(bass_mixer, 0, bass_filter, 0);
-AudioConnection          patchCord17(bass_mixer, 0, bass_filter, 1);
-AudioConnection          patchCord18(drum_filter, 0, drum_mixer, 0);
-AudioConnection          patchCord19(drum_filter, 1, drum_mixer, 1);
-AudioConnection          patchCord20(drum_filter, 2, drum_mixer, 2);
-AudioConnection          patchCord21(mid_filter, 0, mid_filter_mixer, 0);
-AudioConnection          patchCord22(mid_filter, 1, mid_filter_mixer, 1);
-AudioConnection          patchCord23(mid_filter, 2, mid_filter_mixer, 2);
-AudioConnection          patchCord24(bass_filter, 0, bass_filter_mixer, 0);
-AudioConnection          patchCord25(bass_filter, 1, bass_filter_mixer, 1);
-AudioConnection          patchCord26(bass_filter, 2, bass_filter_mixer, 2);
-AudioConnection          patchCord27(lead_filter, 0, lead_filter_mixer, 0);
-AudioConnection          patchCord28(lead_filter, 1, lead_filter_mixer, 1);
-AudioConnection          patchCord29(lead_filter, 2, lead_filter_mixer, 2);
-AudioConnection          patchCord30(drum_mixer, drum_envelope);
-AudioConnection          patchCord31(mid_filter_mixer, mid_envelope);
-AudioConnection          patchCord32(bass_filter_mixer, bass_envelope);
-AudioConnection          patchCord33(lead_filter_mixer, lead_envelope);
-AudioConnection          patchCord34(drum_envelope, 0, global_mixer, 3);
-AudioConnection          patchCord35(mid_envelope, 0, global_mixer, 1);
-AudioConnection          patchCord36(bass_envelope, 0, global_mixer, 2);
-AudioConnection          patchCord37(lead_envelope, 0, global_mixer, 0);
-AudioConnection          patchCord38(global_mixer, 0, global_filter, 0);
-AudioConnection          patchCord39(global_mixer, 0, global_filter, 1);
-AudioConnection          patchCord40(global_filter, 0, global_filter_mixer, 0);
-AudioConnection          patchCord41(global_filter, 1, global_filter_mixer, 1);
-AudioConnection          patchCord42(global_filter, 2, global_filter_mixer, 2);
-AudioConnection          patchCord43(global_filter_mixer, 0, i2s1, 0);
-AudioConnection          patchCord44(global_filter_mixer, 0, i2s1, 1);
+// // Define audio connections
+// AudioConnection          patchCord1(lead_waveform2, 0, lead_mixer, 1);
+// AudioConnection          patchCord2(mid_waveform1, 0, mid_mixer, 0);
+// AudioConnection          patchCord3(lead_waveform1, 0, lead_mixer, 0);
+// AudioConnection          patchCord4(mid_waveform2, 0, mid_mixer, 1);
+// AudioConnection          patchCord5(bass_waveform1, 0, bass_mixer, 0);
+// AudioConnection          patchCord6(bass_waveform2, 0, bass_mixer, 1);
+// AudioConnection          patchCord7(mid_pink, 0, mid_mixer, 2);
+// AudioConnection          patchCord8(lead_pink, 0, lead_mixer, 2);
+// AudioConnection          patchCord9(bass_pink, 0, bass_mixer, 2);
+// AudioConnection          patchCord10(drum, 0, drum_filter, 0);
+// AudioConnection          patchCord11(drum, 0, drum_filter, 1);
+// AudioConnection          patchCord12(mid_mixer, 0, mid_filter, 0);
+// AudioConnection          patchCord13(mid_mixer, 0, mid_filter, 1);
+// AudioConnection          patchCord14(lead_mixer, 0, lead_filter, 0);
+// AudioConnection          patchCord15(lead_mixer, 0, lead_filter, 1);
+// AudioConnection          patchCord16(bass_mixer, 0, bass_filter, 0);
+// AudioConnection          patchCord17(bass_mixer, 0, bass_filter, 1);
+// AudioConnection          patchCord18(drum_filter, 0, drum_mixer, 0);
+// AudioConnection          patchCord19(drum_filter, 1, drum_mixer, 1);
+// AudioConnection          patchCord20(drum_filter, 2, drum_mixer, 2);
+// AudioConnection          patchCord21(mid_filter, 0, mid_filter_mixer, 0);
+// AudioConnection          patchCord22(mid_filter, 1, mid_filter_mixer, 1);
+// AudioConnection          patchCord23(mid_filter, 2, mid_filter_mixer, 2);
+// AudioConnection          patchCord24(bass_filter, 0, bass_filter_mixer, 0);
+// AudioConnection          patchCord25(bass_filter, 1, bass_filter_mixer, 1);
+// AudioConnection          patchCord26(bass_filter, 2, bass_filter_mixer, 2);
+// AudioConnection          patchCord27(lead_filter, 0, lead_filter_mixer, 0);
+// AudioConnection          patchCord28(lead_filter, 1, lead_filter_mixer, 1);
+// AudioConnection          patchCord29(lead_filter, 2, lead_filter_mixer, 2);
+// AudioConnection          patchCord30(drum_mixer, drum_envelope);
+// AudioConnection          patchCord31(mid_filter_mixer, mid_envelope);
+// AudioConnection          patchCord32(bass_filter_mixer, bass_envelope);
+// AudioConnection          patchCord33(lead_filter_mixer, lead_envelope);
+// AudioConnection          patchCord34(drum_envelope, 0, global_mixer, 3);
+// AudioConnection          patchCord35(mid_envelope, 0, global_mixer, 1);
+// AudioConnection          patchCord36(bass_envelope, 0, global_mixer, 2);
+// AudioConnection          patchCord37(lead_envelope, 0, global_mixer, 0);
+// AudioConnection          patchCord38(global_mixer, 0, global_filter, 0);
+// AudioConnection          patchCord39(global_mixer, 0, global_filter, 1);
+// AudioConnection          patchCord40(global_filter, 0, global_filter_mixer, 0);
+// AudioConnection          patchCord41(global_filter, 1, global_filter_mixer, 1);
+// AudioConnection          patchCord42(global_filter, 2, global_filter_mixer, 2);
+// AudioConnection          patchCord43(global_filter_mixer, 0, i2s1, 0);
+// AudioConnection          patchCord44(global_filter_mixer, 0, i2s1, 1);
+
+AudioSetup* AudioSetup::instance = nullptr;
+
+AudioSetup* AudioSetup::getInstance() {
+	if (!instance) {
+		instance = new AudioSetup();
+	}
+	return instance;
+}
 
 
-void setupAudio() {
-  sgtl5000_1.enable();
-  sgtl5000_1.volume(0.32);
+void AudioSetup::setup() {  
+  this->sgtl5000_1.enable();
+  this->sgtl5000_1.volume(0.32);
   
-  AudioMemory(20);
+  AudioMemory(40);
   
+}
+
+AudioSetup::~AudioSetup() {
+  delete instance;
 }

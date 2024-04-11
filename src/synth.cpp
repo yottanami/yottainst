@@ -1,5 +1,7 @@
+#include <memory>
 #include "synth.h"
 #include "audio_setup.h"
+
 
 
 // Constants
@@ -25,58 +27,125 @@ byte LFOmodeSelect = 0;
 unsigned int LFOspeed = 2000;
 // waveforms types
 
+Synth* Synth::instance = nullptr;
+AudioSetup* audio_setup = AudioSetup::getInstance();
 
 
-Synth::Synth(AudioSynthWaveform* waveform1,
-	     AudioSynthWaveform* waveform2,
-	     AudioSynthNoisePink* pink,
-	     AudioFilterStateVariable* filter,
-	     AudioEffectEnvelope* envelope) {
+Synth::Synth(AudioSynthWaveform waveform1,
+	     AudioSynthWaveform waveform2,
+	     AudioSynthNoisePink pink,
+	     AudioEffectEnvelope envelope,
+	     AudioFilterStateVariable filter) {
+  Serial.println("Synth constructor");
   this->waveform1 = waveform1;
-  this->waveform2 = waveform2;
-  this->envelope = envelope;
+  Serial.println("Synth constructor");
+
+  
+  // this->waveform1 = waveform1;
+  // this->waveform2 = waveform2;
+  // this->pink = pink;
+  // this->envelope = envelope;
+  // this->filter = filter;
+  //this->waveform1 = waveform1;
+  
+}
+
+Synth* Synth::getInstance() {
+   if (!instance) {
+     instance = new Synth(
+			  audio_setup->lead_waveform1,
+			  audio_setup->lead_waveform2,
+			  audio_setup->lead_pink,
+			  audio_setup->lead_envelope,
+			  audio_setup->lead_filter
+			  );     
+   }
+  return instance;
 }
 
 void Synth::setup() {
-  waveform1->begin(WAVEFORM_SAWTOOTH);
-  waveform1->pulseWidth(0.15);
-
-  waveform2->begin(WAVEFORM_SINE);
-  waveform2->pulseWidth(0.15);  
+  waveform1.begin(WAVEFORM_SAWTOOTH);
+  waveform1.pulseWidth(0.15);
+  waveform1.amplitude(1.0);
   
 }
 
 void Synth::loop() {
-  LFOupdate(false, LFOmodeSelect, FILfactor, LFOdepth);
-}
-
-void Synth::oscPlay(byte note) {
-  waveform1->frequency(noteFreqs[note] * bendFactor);
-  waveform2->frequency(noteFreqs[note + octave] * detuneFactor * bendFactor * LFOpitch);
-  float velo = (velocity * DIV127);
-  waveform1->amplitude(velo);
-  waveform2->amplitude(velo);
-  pink->amplitude(velo);
-
-  envelope->noteOn();
+  //LFOupdate(false, LFOmodeSelect, FILfactor, LFOdepth);
 }
 
 void Synth::oscStop() {
-  envelope->noteOff();
+	//envelope->noteOff();
 }
 
-void Synth::oscSet() {
-  waveform1->frequency(noteFreqs[globalNote] * bendFactor);
- waveform2->frequency(noteFreqs[globalNote + octave] * detuneFactor * bendFactor * LFOpitch);  
-}
+ void Synth::oscPlay(byte note) {
+   Serial.println("oscplay");
+   waveform1.frequency(50);   
+   waveform1.amplitude(1.0);
+
+   
+   envelope.noteOn();
+   Serial.println("oscplayed");
+   
+   
+
+//     //waveform2->frequency(noteFreqs[note + octave] * detuneFactor * bendFactor * LFOpitch);
+//   // float velo = (velocity * DIV127);
+//   // waveform1->amplitude(velo);
+//   // waveform2->amplitude(velo);
+//   // pink->amplitude(velo);
+
+  
+//   // waveform1->amplitude(1.0);
+//   //waveform2->amplitude(1.0);
+//   //pink->amplitude(1.0);
+// 				// if (envelope == NULL) {
+//   //   		Serial.println("envelope is NULL");
+//   // 	}else{
+    
+//   // envelope->noteOff();
+//   // delay(10);
+//   // envelope->noteOn();
+
+//   // }
+//   Serial.println("Note is played");
+//   waveform1.begin(WAVEFORM_SAWTOOTH);
+//   waveform1.pulseWidth(0.15);
+//   waveform1.frequency(60);
+//   waveform1.amplitude(1.0);
+//   envelope.noteOn();
+  
+
+
+//   //lead_waveform1.frequency(50);
+//   // if (waveform1 == NULL) {
+//   //   		Serial.println("waveform1 is NULL");
+//   // 	}else{
+//   //   Serial.println("Note is pk");
+
+// 		//waveform1
+//   //waveform1->frequency(50);
+//   //waveform1->amplitude(1.0);
+//   //this->waveform1->frequency(50);
+//   //this->waveform1->amplitude(1.0);
+//   //lead_envelope.noteOn();
+  
+ }
+
+
+
+// void Synth::oscSet() {
+//   waveform1.frequency(noteFreqs[globalNote] * bendFactor);
+//   waveform2.frequency(noteFreqs[globalNote + octave] * detuneFactor * bendFactor * LFOpitch);  
+// }
 
 void Synth::onNoteOn(byte channel, byte note, byte vel){
-  if(note > 23 && note < 108){
-    globalNote = note;
-    velocity = vel;
-    keyBuff(note, true);
-    LFOupdate(true, LFOmodeSelect, FILfactor, LFOdepth);
-  }
+   if(note > 23 && note < 108){
+     globalNote = note;
+     velocity = vel;
+     keyBuff(note, true);
+     //LFOupdate(true, LFOmodeSelect, FILfactor, LFOdepth);
+   }
 }
 
 void Synth::onNoteOff(byte channel, byte note, byte velocity){
@@ -85,13 +154,16 @@ void Synth::onNoteOff(byte channel, byte note, byte velocity){
   }
 }
 
-void Synth::keyBuff(byte note, bool playNote){
+void Synth::keyBuff(byte note, bool playNote){ 
+  Serial.println("Note played____XS");
   static byte buff[BUFFER];
   // How many notes are in the buffer
+    Serial.println("Note played____XS2");
   static byte buffSize = 0;
-
+  Serial.println("Note played____XS3");
   // Add note to buffer
   if(playNote == true && buffSize < BUFFER){
+    Serial.println("Note played____XS4");
     oscPlay(note);
     buff[buffSize] = note;
     buffSize++;
@@ -118,144 +190,148 @@ void Synth::keyBuff(byte note, bool playNote){
   }
 }
 
-void Synth::LFOupdate(bool retrig, byte mode, float FILtop, float FILbottom) {
-  static float LFO = 0;
-  static unsigned long LFOtime = 0;
-  static bool LFOdirection = false;
-  unsigned long currentMicros = micros();
-  static bool LFOstop = false;
-  static float LFOrange = 0;
-  static byte oldMode = 0;
-  static bool retriggered = false;
+// void Synth::LFOupdate(bool retrig, byte mode, float FILtop, float FILbottom) {
+//   static float LFO = 0;
+//   static unsigned long LFOtime = 0;
+//   static bool LFOdirection = false;
+//   unsigned long currentMicros = micros();
+//   static bool LFOstop = false;
+//   static float LFOrange = 0;
+//   static byte oldMode = 0;
+//   static bool retriggered = false;
 
-  if (retrig == true) retriggered = true;
+//   if (retrig == true) retriggered = true;
 
 
-  if (currentMicros - LFOtime >= LFOspeed) {
-    LFOtime = currentMicros;
+//   if (currentMicros - LFOtime >= LFOspeed) {
+//     LFOtime = currentMicros;
 
-    if (mode != oldMode) {
-      if (mode == 0 || mode == 8) {
-        LFOpitch = 1;
-	oscSet();
-        filter->frequency(FILfreq);
-      }
-      else if (mode >= 1 || mode <= 7) {
-        LFOpitch = 1;
-        oscSet();
-      }
-      else if (mode >= 9 || mode <= 13) {
-        filter->frequency(FILfreq);
-      }
-      oldMode = mode;
-    }
+//     if (mode != oldMode) {
+//       if (mode == 0 || mode == 8) {
+//         LFOpitch = 1;
+// 	oscSet();
+//         filter.frequency(FILfreq);
+//       }
+//       else if (mode >= 1 || mode <= 7) {
+//         LFOpitch = 1;
+//         oscSet();
+//       }
+//       else if (mode >= 9 || mode <= 13) {
+//         filter.frequency(FILfreq);
+//       }
+//       oldMode = mode;
+//     }
 
-    LFOrange = FILtop - FILbottom;
-    if (LFOrange < 0) LFOrange = 0;
+//     LFOrange = FILtop - FILbottom;
+//     if (LFOrange < 0) LFOrange = 0;
 
-    // LFO Modes
-    switch (mode) {
+//     // LFO Modes
+//     switch (mode) {
 
-    case 0: //Filter OFF
-      return;
-      break;
-    case 1: //Filter FREE
-      filter->frequency(10000 * ((LFOrange * LFO) + LFOdepth));
-      break;
-    case 2: //Filter DOWN
-      if (retriggered == true) {
-	LFOdirection = true;
-	LFO = 1.0;
-      }
-      filter->frequency(10000 * ((LFOrange * LFO) + LFOdepth));
-      break;
-    case 3: //Filter UP
-      if (retriggered == true) {
-	LFOdirection = false;
-	LFO = 0;
-      }
-      filter->frequency(10000 * ((LFOrange * LFO) + LFOdepth));
-      break;
-    case 4: //Filter 1-DN
-      if (retriggered == true) {
-	LFOstop = false;
-	LFOdirection = true;
-	LFO = 1.0;
-      }
-      if (LFOstop == false) filter->frequency(10000 * ((LFOrange * LFO) + LFOdepth));
-      break;
-    case 5: //Filter 1-UP
-      if (retriggered == true) {
-	LFOstop = false;
-	LFOdirection = false;
-	LFO = 0;
-      }
-      if (LFOstop == false) filter->frequency(10000 * ((LFOrange * LFO) + LFOdepth));
-      break;
-    case 8: //Pitch OFF
-      return;
-      break;
-    case 9: //Pitch FREE
-      LFOpitch = (LFO * LFOdepth) + 1;
-      oscSet();
-      break;
-    case 10: //Pitch DOWN
-      if (retriggered == true) {
-	LFOdirection = true;
-	LFO = 1.0;
-      }
-      LFOpitch = (LFO * LFOdepth) + 1;
-      oscSet();
-      break;
-    case 11: //Pitch UP
-      if (retriggered == true) {
-	LFOdirection = false;
-	LFO = 0;
-      }
-      LFOpitch = (LFO * LFOdepth) + 1;
-      oscSet();
-      break;
-    case 12: //Pitch 1-DN
-      if (retriggered == true) {
-	LFOstop = false;
-	LFOdirection = true;
-	LFO = 1.0;
-      }
-      if (LFOstop == false) {
-	LFOpitch = (LFO * LFOdepth) + 1;
-	oscSet();
-      }
-      break;
-    case 13: //Pitch 1-UP
-      if (retriggered == true) {
-	LFOstop = false;
-	LFOdirection = false;
-	LFO = 0;
-      }
-      if (LFOstop == false) {
-	LFOpitch = (LFO * LFOdepth) + 1;
-	oscSet();
-      }
-      break;
-    }
+//     case 0: //Filter OFF
+//       return;
+//       break;
+//     case 1: //Filter FREE
+//       filter.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+//       break;
+//     case 2: //Filter DOWN
+//       if (retriggered == true) {
+// 	LFOdirection = true;
+// 	LFO = 1.0;
+//       }
+//       filter.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+//       break;
+//     case 3: //Filter UP
+//       if (retriggered == true) {
+// 	LFOdirection = false;
+// 	LFO = 0;
+//       }
+//       filter.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+//       break;
+//     case 4: //Filter 1-DN
+//       if (retriggered == true) {
+// 	LFOstop = false;
+// 	LFOdirection = true;
+// 	LFO = 1.0;
+//       }
+//       if (LFOstop == false) filter.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+//       break;
+//     case 5: //Filter 1-UP
+//       if (retriggered == true) {
+// 	LFOstop = false;
+// 	LFOdirection = false;
+// 	LFO = 0;
+//       }
+//       if (LFOstop == false) filter.frequency(10000 * ((LFOrange * LFO) + LFOdepth));
+//       break;
+//     case 8: //Pitch OFF
+//       return;
+//       break;
+//     case 9: //Pitch FREE
+//       LFOpitch = (LFO * LFOdepth) + 1;
+//       oscSet();
+//       break;
+//     case 10: //Pitch DOWN
+//       if (retriggered == true) {
+// 	LFOdirection = true;
+// 	LFO = 1.0;
+//       }
+//       LFOpitch = (LFO * LFOdepth) + 1;
+//       oscSet();
+//       break;
+//     case 11: //Pitch UP
+//       if (retriggered == true) {
+// 	LFOdirection = false;
+// 	LFO = 0;
+//       }
+//       LFOpitch = (LFO * LFOdepth) + 1;
+//       oscSet();
+//       break;
+//     case 12: //Pitch 1-DN
+//       if (retriggered == true) {
+// 	LFOstop = false;
+// 	LFOdirection = true;
+// 	LFO = 1.0;
+//       }
+//       if (LFOstop == false) {
+// 	LFOpitch = (LFO * LFOdepth) + 1;
+// 	oscSet();
+//       }
+//       break;
+//     case 13: //Pitch 1-UP
+//       if (retriggered == true) {
+// 	LFOstop = false;
+// 	LFOdirection = false;
+// 	LFO = 0;
+//       }
+//       if (LFOstop == false) {
+// 	LFOpitch = (LFO * LFOdepth) + 1;
+// 	oscSet();
+//       }
+//       break;
+//     }
 
-    retriggered = false;
+//     retriggered = false;
 
-    // Update LFO
-    if (LFOdirection == false) { //UP
-      LFO = (LFO + 0.01);
-      if (LFO >= 1) {
-        LFOdirection = true;
-        LFOstop = true;
-      }
-    }
+//     // Update LFO
+//     if (LFOdirection == false) { //UP
+//       LFO = (LFO + 0.01);
+//       if (LFO >= 1) {
+//         LFOdirection = true;
+//         LFOstop = true;
+//       }
+//     }
 
-    if (LFOdirection == true) { //Down
-      LFO = (LFO - 0.01);
-      if (LFO <= 0) {
-        LFOdirection = false;
-        LFOstop = true;
-      }
-    }
-  }
+//     if (LFOdirection == true) { //Down
+//       LFO = (LFO - 0.01);
+//       if (LFO <= 0) {
+//         LFOdirection = false;
+//         LFOstop = true;
+//       }
+//     }
+//   }
+// }
+
+Synth::~Synth() {
+  delete instance;
 }

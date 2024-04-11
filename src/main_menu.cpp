@@ -14,8 +14,8 @@ void MainMenu::eventHandler(lv_event_t * event){
     const char * text = lv_label_get_text(label);
     Settings* settings = Settings::getInstance();
 
-    if(strcmp(text, "SYNTHESIZER") == 0){
-      settings->setMode(Mode::SYNTHESIZER);
+    if(strcmp(text, "PLAY") == 0){
+      settings->setMode(Mode::PLAY);
     } else if(strcmp(text, "ARPEGGIATOR") == 0){
       settings->setMode(Mode::ARPEGGIATOR);
     } else if(strcmp(text, "SEQUENCER") == 0){
@@ -56,7 +56,7 @@ void MainMenu::render(){
 
   cont = lv_menu_cont_create(main_page);
   label = lv_label_create(cont);
-  lv_label_set_text(label, "SYNTHESIZER");
+  lv_label_set_text(label, "PLAY");
   lv_menu_set_load_page_event(menu, cont, synth_page);
   lv_obj_add_event_cb(cont, eventHandler, LV_EVENT_PRESSED, NULL);
 

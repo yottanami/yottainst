@@ -26,8 +26,10 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 #include "main_menu.h"
 //#include "lead_synth.h"
 //#include "mid_synth.h"
-#include "audio_setup.h"
 #include "synth.h"
+#include "audio_setup.h"
+#include "play_mode.h"
+#include "settings.h"
 // initialize Synth and store it is lead_synth variable
 // new Synth(lead_waveform1, lead_waveform2);
 // define lead_synth first
@@ -76,8 +78,15 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 
 void setup()
 {
-    Serial.begin( 115200 );
+  Serial.begin( 115200 );
+    
+    while (!Serial) ; // wait for serial monitor open
+    if (CrashReport) {
+      Serial.print(CrashReport);
+      delay(1000);
+    }
 
+     
     lv_init();
     tft.begin(); /* TFT init */
     tft.setRotation(3); /* Landscape orientation */
@@ -103,38 +112,63 @@ void setup()
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
     lv_indev_set_read_cb(indev, my_touchpad_read);
- 
+
+    
+
+    Serial.println("Render");
     main_menu.render();
     		// lv_obj_t * btn = lv_btn_create(lv_scr_act());
 		// lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_PRESSED, NULL); 
 		// lv_obj_align( btn, LV_ALIGN_CENTER, 0, 0 );
 		// 			lv_obj_t * label;
 		// label = lv_label_create(btn);
-		// lv_label_set_text(label, "Hell Yeah");    
-    setupAudio();
+		// lv_label_set_text(label, "Hell Yeah");
+   
     
-    Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
-    lead_synth.setup();
 
-
-    Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
-    mid_synth.setup();
-
-    Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
-
-    lead_synth.oscPlay(69);
-    delay(1000);
-    mid_synth.oscPlay(90);
-    delay(1000);
-    bass_synth.oscPlay(40);
+    AudioSetup* audio_setup = AudioSetup::getInstance();
+        audio_setup->setup();
+    Synth* synth = Synth::getInstance();
+    synth->setup();
     
-    Serial.println( "Setup done" );
+    
+    // synth->setup();
+    // delay(500);
+ 
+    // PlayMode play_mode;
+    // play_mode.setSynth(*synth);
+    // play_mode.setup();
+    
+    //Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
+    // mid_synth.setup();
+     //     mid_synth.oscPlay(300);
+    
+    delay(1000);
+    synth->oscPlay(69);
+     //  Serial.println("sett");
+     // Settings* settings = Settings::getInstance();
+     // settings->setActiveSynth(&lead_synth);
+     // Serial.println("/sett");
+
+ 
+     //delay(1000);
+     
+
+    // Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
+
+    // lead_synth.oscPlay(69);
+    // delay(1000);
+    // mid_synth.oscPlay(90);
+    // delay(1000);
+    // bass_synth.oscPlay(40);
+
+     Serial.println( "Setup dones" );
 }
 
 void loop()
 {
     lv_task_handler(); /* let the GUI do its work */
     lv_tick_inc(5); /* tell LVGL how much time has passed */
-    //usbMIDI.read();
+    play_mode.loop();
 }
 
