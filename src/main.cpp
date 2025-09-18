@@ -6,6 +6,9 @@
 #include <TFT_eSPI.h>
 //#endif
 
+#include "main_menu.h"
+#include "audio_setup.h"
+#include "synth.h"
 
 // XPT2046_Touchscreen
 #define CS_PIN  5
@@ -14,33 +17,22 @@
 #define TFT_HOR_RES   320
 #define TFT_VER_RES   240
 
-
 XPT2046_Touchscreen ts(CS_PIN, TIRQ_PIN);
-TFT_eSPI tft = TFT_eSPI(TFT_HOR_RES, TFT_VER_RES); 
+TFT_eSPI tft = TFT_eSPI(TFT_HOR_RES, TFT_VER_RES);
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
 uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
-
-#include "main_menu.h"
-//#include "lead_synth.h"
-//#include "mid_synth.h"
-#include "audio_setup.h"
-#include "synth.h"
 // initialize Synth and store it is lead_synth variable
-
 Synth synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
-
-// define lead_synth first
-
 
 #if LV_USE_LOG != 0
 void print_logs( lv_log_level_t level, const char * buf )
 {
     LV_UNUSED(level);
-    //Serial.println(buf);
-    //Serial.flush();
+    Serial.println(buf);
+    Serial.flush();
 }
 #endif
 
@@ -86,67 +78,56 @@ void setup()
 {
   Serial.begin( 115200 );
 
-    lv_init();
-    tft.begin(); /* TFT init */
-    tft.setRotation(3); /* Landscape orientation */
-    ts.begin();
-    delay(100);
-    //tft.setRotation(0);
-    ts.setRotation(0);
-    
-    /* register print function for debugging */
-    #if LV_USE_LOG != 0
-       lv_log_register_print_cb( print_logs );
-    #endif
+  // TODO: move display settings to a seperate function
+  lv_init();
+  tft.begin(); /* TFT init */
+  tft.setRotation(3); /* Landscape orientation */
+  ts.begin();
+  delay(100);
+  //tft.setRotation(0);
+  ts.setRotation(0);
+  
+  /* register print function for debugging */
+  #if LV_USE_LOG != 0
+    lv_log_register_print_cb( print_logs );
+  #endif
 
-    lv_display_t * disp;
-    #if LV_USE_TFT_ESPI
-      disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
-    #else
-      disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
-      lv_display_set_flush_cb(disp, my_disp_flush);
-      lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
-    #endif
+  lv_display_t * disp;
+  #if LV_USE_TFT_ESPI
+    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+  #else
+    disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
+    lv_display_set_flush_cb(disp, my_disp_flush);
+    lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+  #endif
 
-    /*Initialize the (dummy) input device driver*/
-    lv_indev_t * indev = lv_indev_create();
-    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
-    lv_indev_set_read_cb(indev, my_touchpad_read);
+  /*Initialize the (dummy) input device driver*/
+  lv_indev_t * indev = lv_indev_create();
+  lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
+  lv_indev_set_read_cb(indev, my_touchpad_read);
  
-    main_menu.render();
-    		// lv_obj_t * btn = lv_btn_create(lv_scr_act());
-		// lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_PRESSED, NULL); 
-		// lv_obj_align( btn, LV_ALIGN_CENTER, 0, 0 );
-		// 			lv_obj_t * label;
-		// label = lv_label_create(btn);
-		// lv_label_set_text(label, "Hell Yeah");    
-    setupAudio();
+  main_menu.render();
+  
+  setupAudio();
     
-    // Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
-    // lead_synth.setup();
+  // Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
+  // lead_synth.setup();
+
+  // Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
+  // mid_synth.setup();
+
+  // Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
+  // bass_synth.setup();
     
-    synth.setup();
+  synth.setup();
+  
+  Serial.println( "Setup done" );
 
-    // Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
-    // mid_synth.setup();
-
-    // Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
-
-    //synth.oscPlay(69);
-    // delay(1000);
-    //delay(1000);
-    // mid_synth.oscPlay(90);
-    // delay(1000);
-    // bass_synth.oscPlay(40);
-    
-    //Serial.println( "Setup done" );
-
-    pinMode(10, OUTPUT);
-    pinMode(20, OUTPUT);
-    pinMode(21, OUTPUT);
-    pinMode(22, OUTPUT);
-    pinMode(A9, INPUT);
-    
+  pinMode(10, OUTPUT);
+  pinMode(20, OUTPUT);
+  pinMode(21, OUTPUT);
+  pinMode(22, OUTPUT);
+  pinMode(A9, INPUT);  
 
 }
 
@@ -170,8 +151,8 @@ void loop()
   synth.loop();
   // delay(250);
   
-    lv_task_handler(); /* let the GUI do its work */
-    lv_tick_inc(5); /* tell LVGL how much time has passed */
-    //usbMIDI.read();
+  lv_task_handler(); /* let the GUI do its work */
+  lv_tick_inc(5); /* tell LVGL how much time has passed */
+  usbMIDI.read();
 }
 
