@@ -42,7 +42,13 @@ void Synth::setup() {
   waveform1->pulseWidth(0.15);
 
   waveform2->begin(WAVEFORM_SINE);
-  waveform2->pulseWidth(0.15);  
+  waveform2->pulseWidth(0.15);
+
+  // TODO:: move these lines to leac synth
+  lead_envelope.attack(10);
+lead_envelope.decay(50);
+lead_envelope.sustain(0.7);
+lead_envelope.release(200);
   
 }
 

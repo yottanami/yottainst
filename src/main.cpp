@@ -29,7 +29,9 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 #include "audio_setup.h"
 #include "synth.h"
 // initialize Synth and store it is lead_synth variable
-// new Synth(lead_waveform1, lead_waveform2);
+
+Synth synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
+
 // define lead_synth first
 
 
@@ -37,8 +39,8 @@ uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 void print_logs( lv_log_level_t level, const char * buf )
 {
     LV_UNUSED(level);
-    Serial.println(buf);
-    Serial.flush();
+    //Serial.println(buf);
+    //Serial.flush();
 }
 #endif
 
@@ -61,14 +63,20 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 {
   bool touched = ts.touched();
   TS_Point p = ts.getPoint();
-
+  
   int x = map(p.y, 400, 3829, 1, TFT_VER_RES);
   int y = map(p.x, 540, 3756, 1, TFT_HOR_RES);
+
+  
   if(!touched) {    
     data->state = LV_INDEV_STATE_RELEASED;
   } else {
     data->state = LV_INDEV_STATE_PRESSED;
 
+      Serial.print("X: ");
+  Serial.print(x);
+
+  
     data->point.x = x;
     data->point.y = y;
   }
@@ -76,12 +84,13 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 
 void setup()
 {
-    Serial.begin( 115200 );
+  Serial.begin( 115200 );
 
     lv_init();
     tft.begin(); /* TFT init */
     tft.setRotation(3); /* Landscape orientation */
     ts.begin();
+    delay(100);
     //tft.setRotation(0);
     ts.setRotation(0);
     
@@ -113,26 +122,54 @@ void setup()
 		// lv_label_set_text(label, "Hell Yeah");    
     setupAudio();
     
-    Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
-    lead_synth.setup();
-
-
-    Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
-    mid_synth.setup();
-
-    Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
-
-    lead_synth.oscPlay(69);
-    delay(1000);
-    mid_synth.oscPlay(90);
-    delay(1000);
-    bass_synth.oscPlay(40);
+    // Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
+    // lead_synth.setup();
     
-    Serial.println( "Setup done" );
+    synth.setup();
+
+    // Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
+    // mid_synth.setup();
+
+    // Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
+
+    //synth.oscPlay(69);
+    // delay(1000);
+    //delay(1000);
+    // mid_synth.oscPlay(90);
+    // delay(1000);
+    // bass_synth.oscPlay(40);
+    
+    //Serial.println( "Setup done" );
+
+    pinMode(10, OUTPUT);
+    pinMode(20, OUTPUT);
+    pinMode(21, OUTPUT);
+    pinMode(22, OUTPUT);
+    pinMode(A9, INPUT);
+    
+
 }
 
 void loop()
 {
+  synth.oscPlay(69);
+  // int channel = 0;
+  // digitalWrite(A5, bitRead(channel, 0));
+  // digitalWrite(A6, bitRead(channel, 1));
+  // digitalWrite(A7, bitRead(channel, 2));
+  // digitalWrite(A8, bitRead(channel, 3));
+
+  //int potValue = analogRead(A9);
+
+  //  Print the value to the serial monitor
+  // Serial.print("Channel ");
+  // Serial.print(channel);
+  // Serial.print(": ");
+  // Serial.println(potValue);
+  
+  synth.loop();
+  // delay(250);
+  
     lv_task_handler(); /* let the GUI do its work */
     lv_tick_inc(5); /* tell LVGL how much time has passed */
     //usbMIDI.read();
