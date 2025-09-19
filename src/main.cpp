@@ -9,6 +9,7 @@
 #include "main_menu.h"
 #include "audio_setup.h"
 #include "synth.h"
+#include "play_mode.h"
 
 // XPT2046_Touchscreen
 #define CS_PIN  5

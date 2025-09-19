@@ -33,7 +33,6 @@ class PlayMode {
   static void myTuneRequest();
   static void myTimeCodeQuarterFrame(byte data);
   static void mySystemExclusiveChunk(byte *array, unsigned size);
-
   
 };
 

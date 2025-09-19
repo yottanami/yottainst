@@ -226,7 +226,6 @@ void myRealTimeSystem(uint8_t realtimebyte) {
 }
 
 
-
 void printBytes(const byte *data, unsigned int size) {
   while (size > 0) {
     byte b = *data++;
