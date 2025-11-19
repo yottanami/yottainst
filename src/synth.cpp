@@ -34,6 +34,8 @@ Synth::Synth(AudioSynthWaveform* waveform1,
 	     AudioEffectEnvelope* envelope) {
   this->waveform1 = waveform1;
   this->waveform2 = waveform2;
+  this->pink = pink;
+  this->filter = filter;
   this->envelope = envelope;
 }
 
@@ -46,9 +48,9 @@ void Synth::setup() {
 
   // TODO:: move these lines to leac synth
   lead_envelope.attack(10);
-lead_envelope.decay(50);
-lead_envelope.sustain(0.7);
-lead_envelope.release(200);
+  lead_envelope.decay(50);
+  lead_envelope.sustain(0.7);
+  lead_envelope.release(200);
   
 }
 
@@ -62,7 +64,7 @@ void Synth::oscPlay(byte note) {
   float velo = (velocity * DIV127);
   waveform1->amplitude(velo);
   waveform2->amplitude(velo);
-  pink->amplitude(velo);
+  pink->amplitude(0);
 
   envelope->noteOn();
 }

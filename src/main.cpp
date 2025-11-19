@@ -66,8 +66,8 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
   } else {
     data->state = LV_INDEV_STATE_PRESSED;
 
-      Serial.print("X: ");
-  Serial.print(x);
+    Serial.print("X: ");
+    Serial.print(x);
 
   
     data->point.x = x;
@@ -102,58 +102,54 @@ void setup()
     lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
   #endif
 
-  /*Initialize the (dummy) input device driver*/
+  /* Initialize the (dummy) input device driver */
   lv_indev_t * indev = lv_indev_create();
   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
   lv_indev_set_read_cb(indev, my_touchpad_read);
  
   main_menu.render();
-  
-  setupAudio();
-    
-  // Synth lead_synth(&lead_waveform1, &lead_waveform2, &lead_pink, &lead_filter, &lead_envelope);
-  // lead_synth.setup();
 
-  // Synth mid_synth(&mid_waveform1, &mid_waveform2, &mid_pink, &mid_filter, &mid_envelope);
-  // mid_synth.setup();
-
-  // Synth bass_synth(&bass_waveform1, &bass_waveform2, &bass_pink, &bass_filter, &bass_envelope);
-  // bass_synth.setup();
+  setupAudio();    
     
   synth.setup();
   
   Serial.println( "Setup done" );
 
-  pinMode(10, OUTPUT);
-  pinMode(20, OUTPUT);
-  pinMode(21, OUTPUT);
-  pinMode(22, OUTPUT);
-  pinMode(A9, INPUT);  
+  //pinMode(10, OUTPUT);
+   //pinMode(20, OUTPUT);
+   // pinMode(21, OUTPUT);
+  // pinMode(22, OUTPUT);
+  // pinMode(A9, INPUT);
 
 }
 
 void loop()
 {
-  synth.oscPlay(69);
+  for(int i=0; i<5; i++) {
+  synth.oscPlay(i*20);
+  delay(1000);
+  synth.oscStop();
+    }
+  
   // int channel = 0;
   // digitalWrite(A5, bitRead(channel, 0));
   // digitalWrite(A6, bitRead(channel, 1));
   // digitalWrite(A7, bitRead(channel, 2));
   // digitalWrite(A8, bitRead(channel, 3));
 
-  //int potValue = analogRead(A9);
+  //  int potValue = analogRead(A9);
 
-  //  Print the value to the serial monitor
+  //   Print the value to the serial monitor
   // Serial.print("Channel ");
   // Serial.print(channel);
   // Serial.print(": ");
   // Serial.println(potValue);
   
-  synth.loop();
-  // delay(250);
+  //synth.loop();
+  //  delay(250);
   
   lv_task_handler(); /* let the GUI do its work */
   lv_tick_inc(5); /* tell LVGL how much time has passed */
-  usbMIDI.read();
+  //usbMIDI.read();
 }
 
