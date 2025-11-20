@@ -128,13 +128,10 @@ void setup()
 
 void loop()
 {
-  for(int i=0; i<5; i++) {
-  synth.oscPlay(i*20);
-  delay(1000);
-  synth.oscStop();
-    }
-
+  // Poll MIDI from USB host and dispatch to Synth
   play_mode.loop();
+
+
   // int channel = 0;
   // digitalWrite(A5, bitRead(channel, 0));
   // digitalWrite(A6, bitRead(channel, 1));
@@ -148,12 +145,12 @@ void loop()
   // Serial.print(channel);
   // Serial.print(": ");
   // Serial.println(potValue);
+
+  // Update synth internals (LFO, envelopes, etc.)
+  synth.loop();
   
-  //synth.loop();
-  //  delay(250);
-  
-  lv_task_handler(); /* let the GUI do its work */
-  lv_tick_inc(5); /* tell LVGL how much time has passed */
+  // Let the GUI do its work
+  lv_task_handler();
+  lv_tick_inc(5);
   //usbMIDI.read();
 }
-
