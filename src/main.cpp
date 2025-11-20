@@ -10,6 +10,8 @@
 #include "audio_setup.h"
 #include "synth.h"
 #include "play_mode.h"
+// define play_mode
+PlayMode play_mode;
 
 // XPT2046_Touchscreen
 #define CS_PIN  5
@@ -112,6 +114,7 @@ void setup()
   setupAudio();    
     
   synth.setup();
+  play_mode.setup();
   
   Serial.println( "Setup done" );
 
@@ -130,7 +133,8 @@ void loop()
   delay(1000);
   synth.oscStop();
     }
-  
+
+  play_mode.loop();
   // int channel = 0;
   // digitalWrite(A5, bitRead(channel, 0));
   // digitalWrite(A6, bitRead(channel, 1));
